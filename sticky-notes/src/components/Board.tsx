@@ -1,7 +1,14 @@
+import Toolbar from "./Toolbar"
+import type { NoteColour } from "./Toolbar"
 
 function Board() {
+
+  const handleAddNote = (colour: NoteColour) => {
+    console.log('Selected colour:', colour )
+  } 
+
   return (
-    <div>Board</div>
+    <Toolbar onAddNote={handleAddNote} />
   )
 }
 
