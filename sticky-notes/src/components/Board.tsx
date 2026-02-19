@@ -12,7 +12,7 @@ function generateId(): string {
 
 function Board() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [noteId, setNoteId] = useState<string | null>("5") //(null);
+  const [draggedNoteId, setDraggedNoteId] = useState<string | null>("5") //(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
   const addNote = (position: Position, colour: NoteColour) => {
@@ -22,13 +22,33 @@ function Board() {
     ]);
   };
 
-   const updateNote = (id: string, updates: Partial<Note>) => {
+  const updateNote = (id: string, updates: Partial<Note>) => {
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...updates } : n)));
   };
 
-    const handleTrashZone = () => {};
-    const handleDrag = () => {};
+  const removeNote = (id: string) => {
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
 
+  // check whether the cursor Y position is inside the trash zone
+  const handleTrashZone = (cursorY: number) => {
+    const overZone = cursorY > window.innerHeight - TRASH_ZONE_HEIGHT;
+    if (overZone !== isOverTrash) {
+      setIsOverTrash(overZone);
+    }
+  };
+  const handleDrag = (noteId: string, isDragging: boolean) => {
+    if(isDragging){
+      setDraggedNoteId(noteId)
+    }
+    else{
+      if(isOverTrash) {
+        removeNote(noteId)
+      }
+      setDraggedNoteId(null);
+      setIsOverTrash(false);
+    }
+  };
 
 
   /* Calculates a random position within the visible board area 
@@ -45,20 +65,23 @@ function Board() {
     addNote(position, colour);
   } 
 
+ 
   return (
-    <>
-    <Toolbar onCreateNote={handleCreateNote} />
-    {notes.map((note) => (
-        <StickyNote
-          key={note.id}
-          note={note}
-          onUpdate={updateNote}
-          onDrag={handleDrag}
-          onTrashZone={handleTrashZone}
-        />
-      ))}
-    <TrashZone isVisible={noteId !== null} isOverTrashZone={isOverTrash} />
-    </>
+    <div style={{background: 'gray', position: "fixed",
+  inset: 0,
+  overflow: 'hidden'}}>
+      <Toolbar onCreateNote={handleCreateNote} />
+      {notes.map((note) => (
+          <StickyNote
+            key={note.id}
+            note={note}
+            onUpdate={updateNote}
+            onDrag={handleDrag}
+            onTrashZone={handleTrashZone}
+          />
+        ))}
+      <TrashZone isVisible={draggedNoteId !== null} isOverTrashZone={isOverTrash} />
+    </div>
 
   )
 }
