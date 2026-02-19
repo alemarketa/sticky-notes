@@ -28,11 +28,10 @@ function StickyNote({note,
    so each mousemove frame always has the latest position — not a stale render = no sluggish note movement*/                                       
   const dragPositionRef = useRef<Position | null>(null); 
   const dragResizeRef = useRef<{ width: number; height: number } | null>(null);
-
+  const dragBoundsRef = useRef<{ maxX: number; maxY: number } | null>(null);
 
 
   const handleEditSetup = () => {
-    console.log('Editing');
     setIsEditing(true);
     textAreaRef.current?.focus();
   };
@@ -42,16 +41,21 @@ function StickyNote({note,
     onDragStart: () => {
       //snapshot the current position
       dragPositionRef.current = note.position
+      dragBoundsRef.current = {
+        maxX: window.innerWidth - note.size.width,
+        maxY: window.innerHeight - note.size.height,
+      };
       onMoveToFront(note.id)
       // activate trash-zone
       onDrag(note.id, true)
     },
 
     onDragMove: (delta, currentPos) => {
-      if (!dragPositionRef.current) return;
+      if (!dragPositionRef.current || !dragBoundsRef.current)  return;
+      const { maxX, maxY } = dragBoundsRef.current;
       const newPos: Position = {
-        x: Math.max(0, dragPositionRef.current.x + delta.x),
-        y: Math.max(0, dragPositionRef.current.y + delta.y),
+        x: Math.min(maxX, Math.max(0, dragPositionRef.current.x + delta.x)),
+        y: Math.min(maxY, Math.max(0, dragPositionRef.current.y + delta.y)),
       };
       dragPositionRef.current = newPos;
       onUpdate(note.id, { position: newPos });
@@ -60,6 +64,7 @@ function StickyNote({note,
 
     onDrop: () => {
       dragPositionRef.current = null;
+      dragBoundsRef.current = null;
       onDrag(note.id, false)
     }
   })

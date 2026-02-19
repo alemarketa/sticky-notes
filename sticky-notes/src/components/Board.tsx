@@ -40,6 +40,21 @@ function Board() {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
   }, [notes]);
 
+    // Clamp all note positions when the window is resized so notes never go off-screen
+  useEffect(() => {
+    const handleResize = () => {
+      setNotes((prev) => prev.map((note) => ({
+        ...note,
+        position: {
+          x: Math.min(note.position.x, Math.max(0, window.innerWidth - note.size.width)),
+          y: Math.min(note.position.y, Math.max(0, window.innerHeight - note.size.height)),
+        },
+      })));
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
