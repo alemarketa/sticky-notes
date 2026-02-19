@@ -3,23 +3,14 @@
 */
 
 import { useState } from "react";
-
-const NOTE_COLOURS = {
-  purple: { background: "#f3e5f5", header: "#e4a8db" },
-  blue: { background: "#e3f2fd", header: "#9dcff8" },
-  green: { background: "#e8f5e9", header: "#ade9af" },
-  yellow: { background: "#fff9c4", header: "#f7ea84" },
-  orange: { background: "#fff3e0", header: "#f7ce90" },
-  red: { background: "#fce4ec", header: "#f48177" },
-} as const satisfies Record<string, { background: string; header: string }>; // fixes circular reference between NOTE_COLOUR and NoteColour 
-
-export type NoteColour = keyof typeof NOTE_COLOURS;
+import type { NoteColour } from "../types";
+import { NOTE_COLOURS } from "../constants";
 
 interface ToolbarProps {
-    onAddNote: (colour: NoteColour) => void;
+    onCreateNote: (colour: NoteColour) => void;
 }
 
-function Toolbar({onAddNote}: ToolbarProps) {
+function Toolbar({onCreateNote}: ToolbarProps) {
 const [selectedColour, setSelectedColour] = useState<NoteColour>("purple");
   return (
     <>
@@ -33,7 +24,7 @@ const [selectedColour, setSelectedColour] = useState<NoteColour>("purple");
                 />
             })}
         </div>
-        <button onClick={()=> onAddNote(selectedColour)}>Add New Note</button>
+        <button onClick={()=> onCreateNote(selectedColour)}>Add New Note</button>
     </>
   )
 }
