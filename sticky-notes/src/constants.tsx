@@ -1,6 +1,6 @@
 import type {Size} from "./types"
 
-export const TRASH_ZONE_HEIGHT = 80;
+export const TRASH_ZONE_HEIGHT = 100;
 
 export const NOTE_MIN_SIZE: Size = { width: 150, height: 100 };
 export const NOTE_DEFAULT_SIZE: Size = { width: 200, height: 160 };

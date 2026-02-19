@@ -3,6 +3,7 @@ import {NOTE_COLOURS, NOTE_MAX_SIZE, NOTE_MIN_SIZE} from '../constants';
 import { useState } from "react";
 import { useDragAndDrop } from "../hooks/useDragAndDrop";
 import { GripHorizontal } from "lucide-react";
+import styles from './StickyNote.module.css';
 
 
 interface NoteProps {
@@ -23,6 +24,7 @@ function StickyNote({note,
 
 
   const handleEditSetup = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    console.log('Editing');
     setIsEditing(true);
     e.currentTarget.focus();
   };
@@ -67,30 +69,39 @@ function StickyNote({note,
   })
   
   return (
-    <div  style={{ position: 'absolute', left: note.position.x,
- top: note.position.y,
- width: note.size.width,
- height: note.size.height }}>
-      <div style={{background: colours.header}}  onMouseDown={moveDrag.startDrag}>
-        Note Header
+    // Inline styles per unique note
+    <div className={styles.note}
+     style={{ 
+      left: note.position.x,
+      top: note.position.y,
+      width: note.size.width,
+      height: note.size.height }}
+    >
+      <div className={styles.header} 
+        style={{background: colours.header}} 
+        onMouseDown={moveDrag.startDrag}>
         <GripHorizontal size={16} color="rgba(0,0,0,0.3)" />
       </div>
-      <div style={{background: colours.background}}>
-         <textarea
+
+      <div className={styles.body}
+        style={{background: colours.background}}
+      >
+        <textarea
           value={note.text}
           onChange={(e) => onUpdate(note.id, { text: e.target.value })}
           onClick={handleEditSetup}
           onBlur={() => setIsEditing(false)}
           readOnly={!isEditing}
           placeholder="Click here to edit..."
+          className={`${styles.textarea} ${!isEditing ? styles.readonly : ""}`}
         />
 
-         <div onMouseDown={resizeDrag.startDrag}>
-          <GripHorizontal
-            size={14}
-            color="rgba(0,0,0,0.25)"
-            style={{ transform: "rotate(45deg)" }}
-          />
+        <div onMouseDown={resizeDrag.startDrag} className={styles.resizeIcon}>
+        <GripHorizontal
+          size={14}
+          color="rgba(0,0,0,0.25)"
+          style={{ transform: "rotate(45deg)" }}
+        />
         </div>
         </div>
     </div>

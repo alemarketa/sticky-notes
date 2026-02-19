@@ -1,0 +1,53 @@
+.toolbar {
+  position: fixed;          
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%); 
+  z-index: 100001;          
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 1rem;                
+
+  & .colourPicker {
+    display: flex;
+    gap: 0.2rem;               
+
+    & .swatch {
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;             
+      border: 2px solid transparent; 
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+      transition: transform 0.1s ease;
+
+      &:hover {
+        transform: scale(1.15);  
+      }
+
+      &.selected {
+        border-color: #555;     
+      }
+    }
+  }
+
+  & .createButton {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    border: none;
+    background: #1c1c1a;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background: #333;  
+    }
+  }
+}

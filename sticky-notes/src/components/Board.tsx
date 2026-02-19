@@ -4,6 +4,7 @@ import type { NoteColour, Position, Note } from "../types"
 import { useState } from "react";
 import { NOTE_DEFAULT_SIZE, TRASH_ZONE_HEIGHT } from "../constants";
 import StickyNote from "./StickyNote";
+import styles from "./Board.module.css";
 
 // Generate Note Id
 function generateId(): string {
@@ -67,9 +68,7 @@ function Board() {
 
  
   return (
-    <div style={{background: 'gray', position: "fixed",
-  inset: 0,
-  overflow: 'hidden'}}>
+    <div className={styles.board}>
       <Toolbar onCreateNote={handleCreateNote} />
       {notes.map((note) => (
           <StickyNote
