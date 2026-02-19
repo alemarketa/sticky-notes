@@ -19,16 +19,20 @@ function TrashZone({isVisible, isOverTrashZone}: TrashZoneProps) {
 
   return (
     <div className={computedStyles} style={{height: TRASH_ZONE_HEIGHT}}>
-      <Trash
-        size={28}
-        color={isOverTrashZone ? "red" : "grey"}
-      />
+      {isVisible && (
+        <>
+          <Trash
+          size={28}
+          color={isOverTrashZone ? "red" : "grey"}
+        />
 
-      <span className={styles.label}>
-        {isOverTrashZone ? "Release to delete" : "Drop here to delete" }
-      </span>
+        <span className={styles.label}>
+          {isOverTrashZone ? "Release to delete" : "Drop here to delete" }
+        </span>
+        </>
+    )}
     </div>
-  )
+  );
 }
 
 export default TrashZone
