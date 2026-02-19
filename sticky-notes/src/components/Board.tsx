@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { NOTE_DEFAULT_SIZE, TRASH_ZONE_HEIGHT } from "../constants";
 import StickyNote from "./StickyNote";
 import styles from "./Board.module.css";
-import { createNote, deleteNote } from "../api/notesApi";
+import { deleteNote } from "../api/notesApi";
 
 // Generate Note Id
 function generateId(): string {
@@ -43,7 +43,6 @@ function Board() {
   const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
-  // Implement API for creatingNote
   const addNote = (position: Position, colour: NoteColour) => {
     const noteToUpdate: Note = {
       id: generateId(),
@@ -56,7 +55,6 @@ function Board() {
     setNotes((prev) => [
       ...prev, noteToUpdate
     ]);
-    createNote(noteToUpdate).catch((error) => console.error("Note creation failed", error));
   };
 
   const updateNote = (id: string, updates: Partial<Note>) => {
