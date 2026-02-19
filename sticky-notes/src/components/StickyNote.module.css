@@ -34,6 +34,7 @@
       font-size: 0.8rem;
       line-height: 1.5;
       color: #333;
+      user-select: text; 
     }
 
     & .readonly {

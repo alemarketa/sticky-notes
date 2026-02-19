@@ -18,4 +18,5 @@ export interface Note {
   size: Size;
   text: string;
   colour: NoteColour;
+  zIndex: number;
 }

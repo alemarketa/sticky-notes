@@ -11,15 +11,18 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+// z-index for moving notes to front
+let nextZIndex = 1;
+
 function Board() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [draggedNoteId, setDraggedNoteId] = useState<string | null>("5") //(null);
+  const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
   const addNote = (position: Position, colour: NoteColour) => {
     setNotes((prev) => [
       ...prev,
-      { id: generateId(), position, size: NOTE_DEFAULT_SIZE, text: "", colour},
+      { id: generateId(), position, size: NOTE_DEFAULT_SIZE, text: "", colour, zIndex: nextZIndex++},
     ]);
   };
 
@@ -30,6 +33,12 @@ function Board() {
   const removeNote = (id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id));
   };
+
+  const moveToFront = (id: string) => {
+    const frontIndex = nextZIndex++;
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, zIndex: frontIndex } : n)));
+  };
+
 
   // check whether the cursor Y position is inside the trash zone
   const handleTrashZone = (cursorY: number) => {
@@ -77,6 +86,7 @@ function Board() {
             onUpdate={updateNote}
             onDrag={handleDrag}
             onTrashZone={handleTrashZone}
+            onMoveToFront={moveToFront}
           />
         ))}
       <TrashZone isVisible={draggedNoteId !== null} isOverTrashZone={isOverTrash} />
