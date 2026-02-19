@@ -1,7 +1,7 @@
 import Toolbar from "./Toolbar"
 import TrashZone from "./TrashZone"
 import type { NoteColour, Position, Note } from "../types"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NOTE_DEFAULT_SIZE, TRASH_ZONE_HEIGHT } from "../constants";
 import StickyNote from "./StickyNote";
 import styles from "./Board.module.css";
@@ -14,8 +14,30 @@ function generateId(): string {
 // z-index for moving notes to front
 let nextZIndex = 1;
 
-function Board() {
-  const [notes, setNotes] = useState<Note[]>([]);
+const LOCAL_STORAGE_KEY = "sticky-notes";
+
+function Board() {  
+  // Lazy initializer function — runs once on mount. Reads saved notes from localStorage
+  const [notes, setNotes] = useState<Note[]>(() => {
+    try {
+      const savedNotes = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedNotes) {
+        const parsed = JSON.parse(savedNotes) as Note[];
+        // restores nextZIndex so new notes always render above existing one
+        nextZIndex = Math.max(...parsed.map((n) => n.zIndex), 0) + 1;
+        return parsed;
+      }
+    } catch(error) {
+      console.error("Failed to load notes from localStorage:", error);
+      
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+  }, [notes]);
+
   const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
 
