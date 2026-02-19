@@ -24,6 +24,11 @@ function StickyNote({note,
   const colours = NOTE_COLOURS[note.colour];
   const [isEditing, setIsEditing] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  /* Tracks the note's position during an active drag/resize outside of React state,                                           
+   so each mousemove frame always has the latest position — not a stale render = no sluggish note movement*/                                       
+  const dragPositionRef = useRef<Position | null>(null); 
+  const dragResizeRef = useRef<{ width: number; height: number } | null>(null);
+
 
 
   const handleEditSetup = () => {
@@ -35,22 +40,26 @@ function StickyNote({note,
   // 1. useDragAndDrop hook instance for moving notes 
   const moveDrag = useDragAndDrop({
     onDragStart: () => {
+      //snapshot the current position
+      dragPositionRef.current = note.position
       onMoveToFront(note.id)
       // activate trash-zone
       onDrag(note.id, true)
     },
 
     onDragMove: (delta, currentPos) => {
+      if (!dragPositionRef.current) return;
       const newPos: Position = {
-        x: Math.max(0, note.position.x + delta.x),
-        y: Math.max(0, note.position.y + delta.y),
+        x: Math.max(0, dragPositionRef.current.x + delta.x),
+        y: Math.max(0, dragPositionRef.current.y + delta.y),
       };
-
+      dragPositionRef.current = newPos;
       onUpdate(note.id, { position: newPos });
       onTrashZone(currentPos.y);
     },
 
     onDrop: () => {
+      dragPositionRef.current = null;
       onDrag(note.id, false)
     }
   })
@@ -58,22 +67,29 @@ function StickyNote({note,
   // 2. instance of useDragAndDrop hook for resizing
   const resizeDrag = useDragAndDrop({
     onDragStart: () => {
+      dragResizeRef.current = note.size;
       onMoveToFront(note.id)
     },
 
     onDragMove: (delta) => {
+      if (!dragResizeRef.current) return;
       const newSize = {
         width: Math.min(
           NOTE_MAX_SIZE.width,
-          Math.max(NOTE_MIN_SIZE.width, note.size.width + delta.x),
+          Math.max(NOTE_MIN_SIZE.width, dragResizeRef.current.width + delta.x),
         ),
         height: Math.min(
           NOTE_MAX_SIZE.height,
-          Math.max(NOTE_MIN_SIZE.height, note.size.height + delta.y),
+          Math.max(NOTE_MIN_SIZE.height, dragResizeRef.current.height + delta.y),
         ),
       };
+      dragResizeRef.current = newSize;
       onUpdate(note.id, {size: newSize});
-    }
+    },
+
+    onDrop: () => {
+      dragResizeRef.current = null;
+    },
   })
   
   return (
