@@ -11,10 +11,12 @@ interface DragAndDropCallbacks {
 export function useDragAndDrop(callbacks: DragAndDropCallbacks) {
   const startPos = useRef<Position>({ x: 0, y: 0 });
   const callbacksRef = useRef(callbacks);
+  /* Overwrite on every render so mousemove/mouseup always call the latest callbacks
+  without adding them as dependencies of the useCallback below (which would
+  re-create and re-attach the document listeners on every render).*/
   callbacksRef.current = callbacks;
   const cleanupRef = useRef<(() => void) | null>(null);
-
-  // cleanup
+ 
   useEffect(() => {
     return () => cleanupRef.current?.();
   }, []);

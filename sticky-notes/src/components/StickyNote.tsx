@@ -27,6 +27,8 @@ function StickyNote({note,
   /* Tracks the note's position during an active drag/resize outside of React state,                                           
    so each mousemove frame always has the latest position — not a stale render = no sluggish note movement*/                                       
   const dragPositionRef = useRef<Position | null>(null); 
+   /* Bounds are snapshotted at drag start rather than read from the closure on                             
+    each move, so they don't depend on React re-render*/ 
   const dragResizeRef = useRef<{ width: number; height: number } | null>(null);
   const dragBoundsRef = useRef<{ maxX: number; maxY: number } | null>(null);
 

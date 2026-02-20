@@ -19,6 +19,8 @@ const LOCAL_STORAGE_KEY = "sticky-notes";
 
 function Board() {  
   
+  const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
+  const [isOverTrash, setIsOverTrash] = useState(false);
   // Lazy initializer function — runs once on mount. Reads saved notes from localStorage
   const [notes, setNotes] = useState<Note[]>(() => {
     try {
@@ -54,9 +56,6 @@ function Board() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
-  const [isOverTrash, setIsOverTrash] = useState(false);
 
   const addNote = (position: Position, colour: NoteColour) => {
     const noteToUpdate: Note = {
