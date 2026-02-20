@@ -1,7 +1,7 @@
 import Toolbar from "./Toolbar"
 import TrashZone from "./TrashZone"
 import type { NoteColour, Position, Note } from "../types"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NOTE_DEFAULT_SIZE, TRASH_ZONE_HEIGHT } from "../constants";
 import StickyNote from "./StickyNote";
 import styles from "./Board.module.css";
@@ -18,7 +18,10 @@ let nextZIndex = 1;
 const LOCAL_STORAGE_KEY = "sticky-notes";
 
 function Board() {  
-  
+  /* Ref mirrors isOverTrash so handleDrag always reads the latest value even if
+   mouseup fires before React has processed the setIsOverTrash state update.
+   This fixes stale closer isOverTrash = false even if the note is already over TZ*/
+  const isOverTrashZoneRef = useRef(false);
   const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
   // Lazy initializer function — runs once on mount. Reads saved notes from localStorage
@@ -90,7 +93,8 @@ function Board() {
   // check whether the cursor Y position is inside the trash zone
   const handleTrashZone = (cursorY: number) => {
     const overZone = cursorY > window.innerHeight - TRASH_ZONE_HEIGHT;
-    if (overZone !== isOverTrash) {
+    if (overZone !== isOverTrashZoneRef.current) {
+      isOverTrashZoneRef.current = overZone;
       setIsOverTrash(overZone);
     }
   };
@@ -99,10 +103,11 @@ function Board() {
       setDraggedNoteId(noteId)
     }
     else{
-      if(isOverTrash) {
+      if(isOverTrashZoneRef.current) {
         removeNote(noteId)
       }
       setDraggedNoteId(null);
+      isOverTrashZoneRef.current = false;
       setIsOverTrash(false);
     }
   };
